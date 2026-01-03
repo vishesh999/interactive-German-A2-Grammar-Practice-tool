@@ -1,6 +1,9 @@
 import streamlit as st
 import random
 from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Page configuration
 st.set_page_config(
@@ -166,6 +169,79 @@ exercises = [
     }
 ]
 
+# Email configuration function
+def send_email(name, email, phone, level, interest, message, score):
+    """
+    Send email using Gmail SMTP
+    
+    SETUP REQUIRED:
+    1. Use Gmail account
+    2. Enable 2-Factor Authentication in your Google Account
+    3. Generate App Password: https://myaccount.google.com/apppasswords
+    4. Replace SENDER_EMAIL and APP_PASSWORD below
+    """
+    
+    # ⚠️ IMPORTANT: Replace these with your actual credentials
+    SENDER_EMAIL = "germanbhashi@gmail.com"  # Your Gmail address
+    APP_PASSWORD = "ntbdswcaxdmqznvd"      # Your Gmail App Password (16 characters, no spaces)
+    RECEIVER_EMAIL = "vishesh@germanbhashi.com"  # Where you want to receive emails
+    
+    try:
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = RECEIVER_EMAIL
+        msg['Subject'] = f"🎯 New GermanBhashi Contact - {name}"
+        
+        # Email body
+        body = f"""
+New Contact Form Submission from GermanBhashi Grammar Practice App
+
+═══════════════════════════════════════════════════════
+📋 CONTACT DETAILS
+═══════════════════════════════════════════════════════
+
+👤 Name:              {name}
+📧 Email:             {email}
+📱 Phone:             {phone if phone else 'Not provided'}
+
+═══════════════════════════════════════════════════════
+📊 LEARNING INFORMATION
+═══════════════════════════════════════════════════════
+
+📚 Current Level:     {level}
+🎯 Interest:          {interest}
+🏆 Quiz Score:        {score}
+
+═══════════════════════════════════════════════════════
+💬 MESSAGE
+═══════════════════════════════════════════════════════
+
+{message if message else 'No message provided'}
+
+═══════════════════════════════════════════════════════
+⏰ Submitted on: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+═══════════════════════════════════════════════════════
+
+This lead came from the A2 Grammar Practice tool.
+Follow up within 24 hours for best results! 🚀
+        """
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Send email using Gmail SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(SENDER_EMAIL, APP_PASSWORD)
+        text = msg.as_string()
+        server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, text)
+        server.quit()
+        
+        return True, "Email sent successfully!"
+        
+    except Exception as e:
+        return False, f"Error: {str(e)}"
+
 # Initialize session state
 if 'current_exercise' not in st.session_state:
     st.session_state.current_exercise = 0
@@ -178,9 +254,27 @@ if 'user_answers' not in st.session_state:
 if 'completed' not in st.session_state:
     st.session_state.completed = False
 
-# Header
-st.markdown("<h1>🇩🇪 German A2 Grammar Practice</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 18px; color: #666;'>Master German Grammar with Interactive Exercises | Powered by GermanBhashi</p>", unsafe_allow_html=True)
+# Header with Logo and QR Code
+header_col1, header_col2, header_col3 = st.columns([1, 3, 1])
+
+with header_col1:
+    # Logo on the left
+    try:
+        st.image("resources/logo.jpg", width=150)  # Adjust width as needed
+    except:
+        st.markdown("**GermanBhashi**")  # Fallback if image not found
+
+with header_col2:
+    st.markdown("<h1>🇩🇪 German A2 Grammar Practice</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 18px; color: #666;'>Master German Grammar with Interactive Exercises | Powered by GermanBhashi</p>", unsafe_allow_html=True)
+
+with header_col3:
+    # QR Code on the right
+    try:
+        st.image("resources/GermanBhashi_QRCode.jpg", width=150)  # Adjust width as needed
+        st.markdown("<p style='text-align: center; font-size: 12px;'>Scan for more info</p>", unsafe_allow_html=True)
+    except:
+        pass  # Hide if QR code not found
 
 # Progress bar
 progress = (st.session_state.current_exercise) / len(exercises)
@@ -347,6 +441,8 @@ else:
                 <li>✓ Native speaker practice sessions</li>
                 <li>✓ Exam-focused preparation</li>
                 <li>✓ Interactive learning materials</li>
+                <li>✓ CV optimization as per German Job market</li>
+                <li>✓ Interview preparation as per job's description</li>
             </ul>
         </div>
     """, unsafe_allow_html=True)
@@ -355,7 +451,7 @@ else:
     
     with col_contact1:
         st.markdown("### 📧 Email Us")
-        st.markdown("[contact@germanbhashi.com](mailto:contact@germanbhashi.com)")
+        st.markdown("[vishesh@germanbhashi.com](mailto:vishesh@germanbhashi.com)")
     
     with col_contact2:
         st.markdown("### 🌐 Visit Website")
@@ -379,15 +475,26 @@ else:
         interest = st.selectbox("I'm interested in:",
                                ["IB German Coaching", "General German Course", 
                                 "Exam Preparation", "Conversation Practice", 
-                                "Study in Germany Guidance"])
+                                "CV optimization", "Interview preparation"])
         message = st.text_area("Message (Optional)")
         
         submitted = st.form_submit_button("📨 Send Message")
         
         if submitted:
             if name and email:
-                st.success(f"Thank you, {name}! We'll contact you at {email} within 24 hours! 🎉")
-                st.markdown("In the meantime, check out our free resources at [germanbhashi.com](https://germanbhashi.com)")
+                # Prepare score text
+                score_text = f"{st.session_state.score}/{len(exercises)} ({percentage:.0f}%)"
+                
+                # Show sending indicator
+                with st.spinner('Sending your message...'):
+                    success, msg = send_email(name, email, phone, level, interest, message, score_text)
+                
+                if success:
+                    st.success(f"✅ Thank you, {name}! We've received your message and will contact you at {email} within 24 hours! 🎉")
+                    st.markdown("In the meantime, check out our website at [germanbhashi.com](https://germanbhashi.com)")
+                else:
+                    st.error(f"❌ {msg}")
+                    st.info("💡 Please check your email configuration in the code or contact us directly at vishesh@germanbhashi.com")
             else:
                 st.error("Please fill in your name and email.")
     
@@ -405,7 +512,7 @@ else:
 st.markdown("---")
 st.markdown("""
     <div style='text-align: center; color: #666; padding: 20px;'>
-        <p>© 2026 GermanBhashi | Your Partner in German Language Excellence</p>
+        <p>© 2025 GermanBhashi | Your Partner in German Language Excellence</p>
         <p style='font-size: 14px;'>Made with ❤️ for German learners worldwide</p>
     </div>
 """, unsafe_allow_html=True)
