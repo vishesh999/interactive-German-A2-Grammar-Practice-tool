@@ -28,24 +28,49 @@ st.markdown("""
         background-color: #FFFFFF !important;
     }
     
-    /* Force all text colors */
-    .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
+    /* AGGRESSIVE GLOBAL TEXT COLOR FORCING */
+    body, p, span, div, li, label, input, textarea, select {
         color: #333333 !important;
     }
     
-    /* Radio button labels */
-    .stRadio label, .stRadio div {
+    /* Force all Streamlit markdown elements */
+    .stMarkdown, .stMarkdown *, 
+    [data-testid="stMarkdownContainer"], 
+    [data-testid="stMarkdownContainer"] * {
         color: #333333 !important;
     }
     
-    /* Form labels */
-    label, .stTextInput label, .stSelectbox label, .stTextArea label {
+    /* Radio button labels and options */
+    .stRadio, .stRadio *, 
+    .stRadio label, 
+    .stRadio div,
+    [data-testid="stMarkdownContainer"] p {
         color: #333333 !important;
     }
     
-    /* Expander text */
-    .streamlit-expanderHeader, .streamlit-expanderContent {
+    /* Form labels and inputs */
+    label, .stTextInput label, .stSelectbox label, .stTextArea label,
+    .stTextInput *, .stSelectbox *, .stTextArea * {
         color: #333333 !important;
+    }
+    
+    /* Expander - MOST IMPORTANT FOR DETAILED RESULTS */
+    .streamlit-expanderHeader, 
+    .streamlit-expanderHeader *,
+    .streamlit-expanderContent, 
+    .streamlit-expanderContent *,
+    [data-testid="stExpander"],
+    [data-testid="stExpander"] *,
+    [data-testid="stExpander"] p,
+    [data-testid="stExpander"] strong,
+    [data-testid="stExpander"] div {
+        color: #333333 !important;
+    }
+    
+    /* Make bold text slightly darker for better contrast */
+    strong, b {
+        color: #2C3E50 !important;
+        font-weight: 700 !important;
     }
     
     /* Headers remain dark */
@@ -53,6 +78,7 @@ st.markdown("""
         color: #2C3E50 !important;
     }
     
+    /* Buttons */
     .stButton>button {
         width: 100%;
         background-color: #FF6B6B;
@@ -66,65 +92,76 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #FF5252;
     }
+    
+    /* Custom answer boxes */
     .correct-answer {
         background-color: #D4EDDA;
         padding: 15px;
         border-radius: 10px;
         border-left: 5px solid #28A745;
         margin: 10px 0;
+    }
+    .correct-answer, .correct-answer * {
         color: #155724 !important;
     }
-    .correct-answer * {
-        color: #155724 !important;
-    }
+    
     .incorrect-answer {
         background-color: #F8D7DA;
         padding: 15px;
         border-radius: 10px;
         border-left: 5px solid #DC3545;
         margin: 10px 0;
+    }
+    .incorrect-answer, .incorrect-answer * {
         color: #721C24 !important;
     }
-    .incorrect-answer * {
-        color: #721C24 !important;
-    }
+    
     .info-box {
         background-color: #E7F3FF;
         padding: 20px;
         border-radius: 10px;
         border-left: 5px solid #2196F3;
         margin: 20px 0;
+    }
+    .info-box, .info-box * {
         color: #004085 !important;
     }
-    .info-box * {
-        color: #004085 !important;
-    }
+    
     .score-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white !important;
         padding: 30px;
         border-radius: 15px;
         text-align: center;
         margin: 20px 0;
     }
-    .score-card * {
+    .score-card, .score-card * {
         color: white !important;
     }
+    
     .contact-section {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white !important;
         padding: 30px;
         border-radius: 15px;
         text-align: center;
         margin: 30px 0;
     }
-    .contact-section * {
+    .contact-section, .contact-section * {
         color: white !important;
     }
     
     /* Progress bar text */
-    .stProgress + div {
+    .stProgress + div, .stProgress + div * {
         color: #333333 !important;
+    }
+    
+    /* Links in expanders and everywhere else */
+    a {
+        color: #2196F3 !important;
+    }
+    
+    /* Mobile notice if you add it back */
+    .mobile-notice {
+        color: #666 !important;
     }
     </style>
 """, unsafe_allow_html=True)
