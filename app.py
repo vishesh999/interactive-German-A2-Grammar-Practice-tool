@@ -18,19 +18,45 @@ st.markdown("""
     <style>
     /* Force light theme */
     [data-testid="stAppViewContainer"] {
-        background-color: #FFFFFF;
+        background-color: #FFFFFF !important;
     }
     [data-testid="stHeader"] {
-        background-color: #FFFFFF;
+        background-color: #FFFFFF !important;
     }
     .main {
         padding: 2rem;
-        background-color: #FFFFFF;
+        background-color: #FFFFFF !important;
     }
+    
+    /* Force all text colors */
+    .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
+        color: #333333 !important;
+    }
+    
+    /* Radio button labels */
+    .stRadio label, .stRadio div {
+        color: #333333 !important;
+    }
+    
+    /* Form labels */
+    label, .stTextInput label, .stSelectbox label, .stTextArea label {
+        color: #333333 !important;
+    }
+    
+    /* Expander text */
+    .streamlit-expanderHeader, .streamlit-expanderContent {
+        color: #333333 !important;
+    }
+    
+    /* Headers remain dark */
+    h1, h2, h3, h4, h5, h6 {
+        color: #2C3E50 !important;
+    }
+    
     .stButton>button {
         width: 100%;
         background-color: #FF6B6B;
-        color: white;
+        color: white !important;
         font-weight: bold;
         border-radius: 10px;
         padding: 0.5rem 1rem;
@@ -46,7 +72,10 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #28A745;
         margin: 10px 0;
-        color: #155724;
+        color: #155724 !important;
+    }
+    .correct-answer * {
+        color: #155724 !important;
     }
     .incorrect-answer {
         background-color: #F8D7DA;
@@ -54,7 +83,10 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #DC3545;
         margin: 10px 0;
-        color: #721C24;
+        color: #721C24 !important;
+    }
+    .incorrect-answer * {
+        color: #721C24 !important;
     }
     .info-box {
         background-color: #E7F3FF;
@@ -62,33 +94,40 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #2196F3;
         margin: 20px 0;
-        color: #004085;
+        color: #004085 !important;
+    }
+    .info-box * {
+        color: #004085 !important;
     }
     .score-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: white !important;
         padding: 30px;
         border-radius: 15px;
         text-align: center;
         margin: 20px 0;
     }
+    .score-card * {
+        color: white !important;
+    }
     .contact-section {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
+        color: white !important;
         padding: 30px;
         border-radius: 15px;
         text-align: center;
         margin: 30px 0;
     }
-    h1, h2, h3, h4, h5, h6 {
-        color: #2C3E50;
+    .contact-section * {
+        color: white !important;
     }
-    p, li, label {
-        color: #333333;
+    
+    /* Progress bar text */
+    .stProgress + div {
+        color: #333333 !important;
     }
     </style>
 """, unsafe_allow_html=True)
-
 # Exercise database - ALL Partizip Perfekt questions
 exercises = [
     {
