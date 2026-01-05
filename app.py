@@ -5,18 +5,27 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# Page configuration
+# Page configuration with light mode
 st.set_page_config(
-    page_title="German A2 Grammar Practice | GermanBhashi",
+    page_title="German Partizip Perfekt Practice | GermanBhashi",
     page_icon="🇩🇪",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for better UI
+# Force light mode
 st.markdown("""
     <style>
+    /* Force light theme */
+    [data-testid="stAppViewContainer"] {
+        background-color: #FFFFFF;
+    }
+    [data-testid="stHeader"] {
+        background-color: #FFFFFF;
+    }
     .main {
         padding: 2rem;
+        background-color: #FFFFFF;
     }
     .stButton>button {
         width: 100%;
@@ -37,6 +46,7 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #28A745;
         margin: 10px 0;
+        color: #155724;
     }
     .incorrect-answer {
         background-color: #F8D7DA;
@@ -44,6 +54,7 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #DC3545;
         margin: 10px 0;
+        color: #721C24;
     }
     .info-box {
         background-color: #E7F3FF;
@@ -51,6 +62,7 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #2196F3;
         margin: 20px 0;
+        color: #004085;
     }
     .score-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -68,104 +80,116 @@ st.markdown("""
         text-align: center;
         margin: 30px 0;
     }
-    h1 {
+    h1, h2, h3, h4, h5, h6 {
         color: #2C3E50;
-        text-align: center;
+    }
+    p, li, label {
+        color: #333333;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Exercise database with 10 fill-in-the-blank questions
+# Exercise database - ALL Partizip Perfekt questions
 exercises = [
     {
         "id": 1,
-        "sentence": "Ich ___ gestern im Kino.",
-        "options": ["bin", "war", "habe", "hatte"],
-        "correct": "war",
-        "explanation": "Correct! 'War' is the simple past (Präteritum) form of 'sein' (to be) for 'ich'. We use simple past for common verbs like 'sein' and 'haben' when talking about the past.",
-        "topic": "Simple Past (Präteritum)",
-        "translation": "I was at the cinema yesterday."
+        "sentence": "Ich habe gestern einen Brief ___. (schreiben)",
+        "options": ["geschrieben", "geschreibt", "geskribben", "schreibt"],
+        "correct": "geschrieben",
+        "explanation": "Correct! 'Geschrieben' is the Partizip Perfekt of the irregular verb 'schreiben'. Irregular verbs typically form the past participle with ge- + stem change + -en.",
+        "topic": "Partizip Perfekt - Irregular Verbs",
+        "translation": "I wrote a letter yesterday.",
+        "verb_type": "Irregular verb"
     },
     {
         "id": 2,
-        "sentence": "Wir ___ einen Brief geschrieben.",
-        "options": ["sind", "haben", "wurden", "werden"],
-        "correct": "haben",
-        "explanation": "Excellent! 'Haben' is used as the auxiliary verb with 'geschrieben' to form the perfect tense. Most verbs use 'haben' in the Perfekt.",
-        "topic": "Perfect Tense (Perfekt)",
-        "translation": "We have written a letter."
+        "sentence": "Wir haben das Haus ___. (kaufen)",
+        "options": ["gekauft", "gekafen", "kauft", "gekaufen"],
+        "correct": "gekauft",
+        "explanation": "Perfect! 'Gekauft' is the Partizip Perfekt of the regular verb 'kaufen'. Regular verbs form the past participle with ge- + stem + -t.",
+        "topic": "Partizip Perfekt - Regular Verbs",
+        "translation": "We bought the house.",
+        "verb_type": "Regular verb"
     },
     {
         "id": 3,
-        "sentence": "Sie ___ nach Berlin gefahren.",
-        "options": ["ist", "hat", "war", "wird"],
-        "correct": "ist",
-        "explanation": "Perfect! 'Ist' is correct because 'fahren' is a verb of movement and uses 'sein' as the auxiliary verb in the perfect tense.",
-        "topic": "Perfect Tense with Movement Verbs",
-        "translation": "She has driven/traveled to Berlin."
+        "sentence": "Sie ist nach Berlin ___. (fahren)",
+        "options": ["gefahren", "gefahrt", "gefahrt", "fahrt"],
+        "correct": "gefahren",
+        "explanation": "Excellent! 'Gefahren' is the Partizip Perfekt of 'fahren'. This verb uses 'sein' as auxiliary because it indicates movement from one place to another.",
+        "topic": "Partizip Perfekt - Movement Verbs with 'sein'",
+        "translation": "She traveled to Berlin.",
+        "verb_type": "Irregular verb (movement)"
     },
     {
         "id": 4,
-        "sentence": "Der Mann, ___ Frau Lehrerin ist, wohnt hier.",
-        "options": ["der", "dessen", "dem", "den"],
-        "correct": "dessen",
-        "explanation": "Great job! 'Dessen' is the genitive form of the relative pronoun for masculine/neuter nouns, meaning 'whose'. It shows possession.",
-        "topic": "Relative Pronouns (Genitive)",
-        "translation": "The man whose wife is a teacher lives here."
+        "sentence": "Er hat das Problem ___. (verstehen)",
+        "options": ["verstanden", "geverstanden", "versteht", "gestanden"],
+        "correct": "verstanden",
+        "explanation": "Great! 'Verstanden' is correct. Verbs with inseparable prefixes (ver-, be-, er-, ent-, emp-, ge-, miss-, zer-) do NOT add 'ge-' in the Partizip Perfekt.",
+        "topic": "Partizip Perfekt - Inseparable Prefix Verbs",
+        "translation": "He understood the problem.",
+        "verb_type": "Irregular verb with inseparable prefix"
     },
     {
         "id": 5,
-        "sentence": "Wenn ich Zeit ___, würde ich dich besuchen.",
-        "options": ["habe", "hätte", "hatte", "haben"],
-        "correct": "hätte",
-        "explanation": "Correct! 'Hätte' is the Konjunktiv II form of 'haben'. We use it for hypothetical or unreal conditions in the present or future.",
-        "topic": "Subjunctive II (Konjunktiv II)",
-        "translation": "If I had time, I would visit you."
+        "sentence": "Ich habe die Tür ___. (aufmachen)",
+        "options": ["aufgemacht", "geaufmacht", "aufmacht", "aufgmacht"],
+        "correct": "aufgemacht",
+        "explanation": "Perfect! 'Aufgemacht' is the Partizip Perfekt of the separable verb 'aufmachen'. With separable verbs, 'ge-' goes between the prefix and the stem: auf-ge-macht.",
+        "topic": "Partizip Perfekt - Separable Verbs",
+        "translation": "I opened the door.",
+        "verb_type": "Separable verb"
     },
     {
         "id": 6,
-        "sentence": "Das Buch liegt ___ dem Tisch.",
-        "options": ["auf", "über", "in", "an"],
-        "correct": "auf",
-        "explanation": "Perfect! 'Auf' (on) is the correct preposition for objects lying on a horizontal surface. With dative case (dem), it indicates position.",
-        "topic": "Two-Way Prepositions (Wechselpräpositionen)",
-        "translation": "The book is lying on the table."
+        "sentence": "Wir haben den Film ___. (sehen)",
+        "options": ["gesehen", "geseht", "sehen", "gesieht"],
+        "correct": "gesehen",
+        "explanation": "Correct! 'Gesehen' is the Partizip Perfekt of the irregular verb 'sehen'. The stem vowel changes from 'e' to 'e' in this case.",
+        "topic": "Partizip Perfekt - Irregular Verbs",
+        "translation": "We saw the film.",
+        "verb_type": "Irregular verb"
     },
     {
         "id": 7,
-        "sentence": "Ich freue mich ___ die Ferien.",
-        "options": ["auf", "über", "für", "an"],
-        "correct": "auf",
-        "explanation": "Excellent! 'Sich freuen auf' means 'to look forward to' (something in the future). The preposition 'auf' with accusative case is required here.",
-        "topic": "Reflexive Verbs with Prepositions",
-        "translation": "I'm looking forward to the holidays."
+        "sentence": "Sie hat ihr Zimmer ___. (aufräumen)",
+        "options": ["aufgeräumt", "geaufräumt", "aufräumt", "aufgeräumen"],
+        "correct": "aufgeräumt",
+        "explanation": "Excellent! 'Aufgeräumt' is correct. This separable verb places 'ge-' between the prefix 'auf' and the stem 'räum' + regular ending '-t'.",
+        "topic": "Partizip Perfekt - Separable Regular Verbs",
+        "translation": "She cleaned up her room.",
+        "verb_type": "Separable regular verb"
     },
     {
         "id": 8,
-        "sentence": "Er arbeitet, ___ Geld zu verdienen.",
-        "options": ["um", "zu", "für", "damit"],
-        "correct": "um",
-        "explanation": "Great! 'Um...zu' is used to express purpose or goal (in order to). This construction is used when the subject is the same in both clauses.",
-        "topic": "Infinitive Clauses with 'um...zu'",
-        "translation": "He works in order to earn money."
+        "sentence": "Er hat den Text ___. (übersetzen)",
+        "options": ["übersetzt", "geübersetzt", "übergesetzt", "übersetzet"],
+        "correct": "übersetzt",
+        "explanation": "Great! 'Übersetzt' is correct. 'Übersetzen' (to translate) has an inseparable prefix 'über-', so no 'ge-' is added. Note: 'über-' can be separable or inseparable depending on meaning!",
+        "topic": "Partizip Perfekt - Inseparable Prefix Verbs",
+        "translation": "He translated the text.",
+        "verb_type": "Inseparable prefix verb"
     },
     {
         "id": 9,
-        "sentence": "Nachdem ich gegessen ___, ging ich spazieren.",
-        "options": ["habe", "hatte", "bin", "war"],
-        "correct": "hatte",
-        "explanation": "Perfect! 'Hatte' is the past perfect (Plusquamperfekt) auxiliary. We use Plusquamperfekt after 'nachdem' to show an action completed before another past action.",
-        "topic": "Past Perfect (Plusquamperfekt)",
-        "translation": "After I had eaten, I went for a walk."
+        "sentence": "Ich habe das Buch ___. (lesen)",
+        "options": ["gelesen", "gelest", "lesen", "gelist"],
+        "correct": "gelesen",
+        "explanation": "Perfect! 'Gelesen' is the Partizip Perfekt of 'lesen'. The stem vowel changes from 'e' to 'e', and it takes the irregular ending '-en'.",
+        "topic": "Partizip Perfekt - Irregular Verbs",
+        "translation": "I read the book.",
+        "verb_type": "Irregular verb"
     },
     {
         "id": 10,
-        "sentence": "Das Auto wird von meinem Vater ___.",
-        "options": ["gefahren", "fahren", "fuhr", "gefahrt"],
-        "correct": "gefahren",
-        "explanation": "Excellent! 'Gefahren' is the past participle of 'fahren'. In passive voice with 'wird...von', we use the past participle. This is the passive voice (Passiv).",
-        "topic": "Passive Voice (Passiv)",
-        "translation": "The car is driven by my father."
+        "sentence": "Sie sind nach Hause ___. (gehen)",
+        "options": ["gegangen", "gegeht", "gangen", "gegehn"],
+        "correct": "gegangen",
+        "explanation": "Excellent! 'Gegangen' is the Partizip Perfekt of 'gehen'. This verb uses 'sein' as auxiliary because it indicates movement, and the past participle is formed irregularly.",
+        "topic": "Partizip Perfekt - Movement Verbs",
+        "translation": "They went home.",
+        "verb_type": "Irregular verb (movement)"
     }
 ]
 
@@ -183,7 +207,7 @@ def send_email(name, email, phone, level, interest, message, score):
     
     # ⚠️ IMPORTANT: Replace these with your actual credentials
     SENDER_EMAIL = "germanbhashi@gmail.com"  # Your Gmail address
-    APP_PASSWORD = "ntbdswcaxdmqznvd"      # Your Gmail App Password (16 characters, no spaces)
+    APP_PASSWORD = ""      # Your Gmail App Password (16 characters, no spaces)
     RECEIVER_EMAIL = "vishesh@germanbhashi.com"  # Where you want to receive emails
     
     try:
@@ -195,7 +219,7 @@ def send_email(name, email, phone, level, interest, message, score):
         
         # Email body
         body = f"""
-New Contact Form Submission from GermanBhashi Grammar Practice App
+New Contact Form Submission from GermanBhashi Partizip Perfekt Practice App
 
 ═══════════════════════════════════════════════════════
 📋 CONTACT DETAILS
@@ -223,7 +247,7 @@ New Contact Form Submission from GermanBhashi Grammar Practice App
 ⏰ Submitted on: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 ═══════════════════════════════════════════════════════
 
-This lead came from the A2 Grammar Practice tool.
+This lead came from the Partizip Perfekt Practice tool.
 Follow up within 24 hours for best results! 🚀
         """
         
@@ -253,6 +277,13 @@ if 'user_answers' not in st.session_state:
     st.session_state.user_answers = [None] * len(exercises)
 if 'completed' not in st.session_state:
     st.session_state.completed = False
+if 'shuffled_options' not in st.session_state:
+    # Shuffle options for each exercise once at the start
+    st.session_state.shuffled_options = []
+    for ex in exercises:
+        shuffled = ex['options'].copy()
+        random.shuffle(shuffled)
+        st.session_state.shuffled_options.append(shuffled)
 
 # Header with Logo and QR Code
 header_col1, header_col2, header_col3 = st.columns([1, 3, 1])
@@ -260,21 +291,49 @@ header_col1, header_col2, header_col3 = st.columns([1, 3, 1])
 with header_col1:
     # Logo on the left
     try:
-        st.image("resources/logo.jpg", width=150)  # Adjust width as needed
+        st.image("resources/logo.jpg", width=150)
     except:
-        st.markdown("**GermanBhashi**")  # Fallback if image not found
+        st.markdown("**GermanBhashi**")
 
 with header_col2:
-    st.markdown("<h1>🇩🇪 German A2 Grammar Practice</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 18px; color: #666;'>Master German Grammar with Interactive Exercises | Powered by GermanBhashi</p>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style="
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            margin-top: -8px;
+        ">
+            <h1 style="
+                margin-bottom: 6px;
+            ">
+                🇩🇪 German Partizip Perfekt Practice
+            </h1>
+            <p style="
+                font-size: 18px;
+                color: #666;
+                margin: 0;
+            ">
+                Master Past Participles with Interactive Exercises | Powered by GermanBhashi
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
 with header_col3:
-    # QR Code on the right
     try:
-        st.image("resources/GermanBhashi_QRCode.jpg", width=150)  # Adjust width as needed
-        st.markdown("<p style='text-align: center; font-size: 12px;'>Scan for more info</p>", unsafe_allow_html=True)
+        st.image("resources/GermanBhashi_QRCode.jpg", width=150, caption="Scan for more info")
     except:
-        pass  # Hide if QR code not found
+        pass
+
+
+# Mobile notice
+st.markdown("""
+    <div class='mobile-notice'>
+        💻 For the best experience, please use a laptop or desktop computer
+    </div>
+""", unsafe_allow_html=True)
 
 # Progress bar
 progress = (st.session_state.current_exercise) / len(exercises)
@@ -289,15 +348,15 @@ if not st.session_state.completed:
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown(f"### 📝 Exercise {current_ex['id']}")
         st.markdown(f"**Topic:** {current_ex['topic']}")
-        st.markdown(f"#### Fill in the blank:")
+        st.markdown(f"**Verb Type:** {current_ex['verb_type']}")
+        st.markdown(f"#### Fill in the correct Partizip Perfekt:")
         st.markdown(f"<p style='font-size: 20px; font-weight: bold; color: #2C3E50;'>{current_ex['sentence']}</p>", unsafe_allow_html=True)
         
         # Answer options
         selected_answer = st.radio(
-            "Choose the correct answer:",
-            current_ex['options'],
+            "Choose the correct past participle:",
+            st.session_state.shuffled_options[st.session_state.current_exercise],
             key=f"q_{current_ex['id']}",
             disabled=st.session_state.answered[st.session_state.current_exercise]
         )
@@ -371,12 +430,12 @@ if not st.session_state.completed:
         # Quick tips
         st.markdown("""
             <div class='info-box'>
-                <h4>💡 Quick Tips:</h4>
+                <h4>💡 Partizip Perfekt Tips:</h4>
                 <ul>
-                    <li>Read each sentence carefully</li>
-                    <li>Consider the context</li>
-                    <li>Think about grammar rules</li>
-                    <li>Learn from explanations</li>
+                    <li><strong>Regular verbs:</strong> ge- + stem + -t</li>
+                    <li><strong>Irregular verbs:</strong> ge- + stem + -en</li>
+                    <li><strong>Separable verbs:</strong> prefix + ge- + stem</li>
+                    <li><strong>Inseparable prefixes:</strong> no "ge-" added</li>
                 </ul>
             </div>
         """, unsafe_allow_html=True)
@@ -390,7 +449,7 @@ else:
     st.markdown(f"""
         <div class='score-card'>
             <h1>🎉 Congratulations!</h1>
-            <h2>You've completed all exercises!</h2>
+            <h2>You've completed all Partizip Perfekt exercises!</h2>
             <h1 style='font-size: 60px; margin: 20px 0;'>{st.session_state.score} / {len(exercises)}</h1>
             <h3>{percentage:.0f}% Correct</h3>
         </div>
@@ -398,16 +457,16 @@ else:
     
     # Performance feedback
     if percentage >= 90:
-        feedback = "🌟 Outstanding! You have excellent command of A2 German grammar!"
+        feedback = "🌟 Outstanding! You've mastered Partizip Perfekt formation!"
         emoji = "🏆"
     elif percentage >= 70:
-        feedback = "👏 Great job! You're well on your way to mastering A2 level!"
+        feedback = "👏 Great job! You have a solid understanding of past participles!"
         emoji = "⭐"
     elif percentage >= 50:
-        feedback = "👍 Good effort! Keep practicing to improve further!"
+        feedback = "👍 Good effort! Keep practicing different verb types!"
         emoji = "📚"
     else:
-        feedback = "💪 Keep learning! More practice will help you improve!"
+        feedback = "💪 Keep learning! Focus on the different formation rules!"
         emoji = "🎯"
     
     st.markdown(f"### {emoji} {feedback}")
@@ -423,6 +482,7 @@ else:
             st.markdown(f"**Sentence:** {ex['sentence']}")
             st.markdown(f"**Your Answer:** {user_ans}")
             st.markdown(f"**Correct Answer:** {ex['correct']}")
+            st.markdown(f"**Verb Type:** {ex['verb_type']}")
             st.markdown(f"**Explanation:** {ex['explanation']}")
             st.markdown(f"**Translation:** {ex['translation']}")
     
@@ -482,10 +542,8 @@ else:
         
         if submitted:
             if name and email:
-                # Prepare score text
                 score_text = f"{st.session_state.score}/{len(exercises)} ({percentage:.0f}%)"
                 
-                # Show sending indicator
                 with st.spinner('Sending your message...'):
                     success, msg = send_email(name, email, phone, level, interest, message, score_text)
                 
@@ -506,6 +564,12 @@ else:
         st.session_state.answered = [False] * len(exercises)
         st.session_state.user_answers = [None] * len(exercises)
         st.session_state.completed = False
+        # Re-shuffle options for new practice session
+        st.session_state.shuffled_options = []
+        for ex in exercises:
+            shuffled = ex['options'].copy()
+            random.shuffle(shuffled)
+            st.session_state.shuffled_options.append(shuffled)
         st.rerun()
 
 # Footer
