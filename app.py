@@ -54,6 +54,38 @@ st.markdown("""
         color: #333333 !important;
     }
     
+    /* INPUT FIELDS - FORCE TEXT COLOR WHEN TYPING */
+    input[type="text"], 
+    input[type="email"], 
+    input[type="tel"],
+    textarea,
+    select {
+        color: #333333 !important;
+        background-color: #FFFFFF !important;
+    }
+    
+    /* Streamlit input components */
+    [data-baseweb="input"] input,
+    [data-baseweb="textarea"] textarea,
+    [data-baseweb="select"] {
+        color: #333333 !important;
+        background-color: #FFFFFF !important;
+    }
+    
+    /* Input placeholder text */
+    input::placeholder,
+    textarea::placeholder {
+        color: #999999 !important;
+        opacity: 1 !important;
+    }
+    
+    /* Dropdown/Select options */
+    [data-baseweb="select"] div,
+    [data-baseweb="popover"] div {
+        color: #333333 !important;
+        background-color: #FFFFFF !important;
+    }
+    
     /* Expander - MOST IMPORTANT FOR DETAILED RESULTS */
     .streamlit-expanderHeader, 
     .streamlit-expanderHeader *,
@@ -91,6 +123,15 @@ st.markdown("""
     }
     .stButton>button:hover {
         background-color: #FF5252;
+    }
+    
+    /* Form submit button styling */
+    [data-testid="stFormSubmitButton"] button {
+        background-color: #4CAF50 !important;
+        color: white !important;
+    }
+    [data-testid="stFormSubmitButton"] button:hover {
+        background-color: #45a049 !important;
     }
     
     /* Custom answer boxes */
@@ -283,7 +324,7 @@ def send_email(name, email, phone, level, interest, message, score):
     
     # ⚠️ IMPORTANT: Replace these with your actual credentials
     SENDER_EMAIL = "germanbhashi@gmail.com"  # Your Gmail address
-    APP_PASSWORD = ""      # Your Gmail App Password (16 characters, no spaces)
+    APP_PASSWORD = "ntbdswcaxdmqznvd"      # Your Gmail App Password (16 characters, no spaces)
     RECEIVER_EMAIL = "vishesh@germanbhashi.com"  # Where you want to receive emails
     
     try:
